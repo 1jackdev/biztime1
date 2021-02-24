@@ -8,6 +8,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 app.use("/companies", require("./routes/companies"))
+app.use("/invoices", require("./routes/invoices"))
 
 
 /** 404 handler */

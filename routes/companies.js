@@ -5,16 +5,16 @@ const ExpressError = require("../expressError");
 
 //checks if a code is in the db
 async function checkCode(code) {
-    const codeCheck = await db.query(
-      `SELECT code, name, description FROM companies WHERE code=$1`,
-      [code]
-    );
-    if (codeCheck.rowCount === 0) {
-      const err = new ExpressError("Company Not Found", 404);
-      return (err);
-    }
+  const codeCheck = await db.query(
+    `SELECT code, name, description FROM companies WHERE code=$1`,
+    [code]
+  );
+  if (codeCheck.rowCount === 0) {
+    const err = new ExpressError("Company Not Found", 404);
+    return err;
   }
-  
+}
+
 //get all company data
 router.get("/", async (req, res, next) => {
   try {
@@ -30,12 +30,19 @@ router.get("/:code", async (req, res, next) => {
   try {
     const { code } = req.params;
     const codecheckErr = await checkCode(code);
-    if (codecheckErr) {return next(codecheckErr)};
-    const results = await db.query(
+    if (codecheckErr) {
+      return next(codecheckErr);
+    }
+    const compResults = await db.query(
       `SELECT code, name, description FROM companies WHERE code=$1`,
       [code]
     );
-    return res.json({ company: results.rows[0] });
+    const invResults = await db.query(
+      `SELECT * FROM invoices WHERE comp_code=$1`,
+      [code]
+    );
+    compResults.rows[0].invoices = invResults.rows
+    return res.json({ company: compResults.rows[0] });
   } catch (error) {
     return next(error);
   }
@@ -60,7 +67,9 @@ router.put("/:code", async (req, res, next) => {
   try {
     const { code } = req.params;
     const codecheckErr = await checkCode(code);
-    if (codecheckErr) {return next(codecheckErr)};
+    if (codecheckErr) {
+      return next(codecheckErr);
+    }
 
     const { name, description } = req.body;
     const results = await db.query(
@@ -78,13 +87,14 @@ router.delete("/:code", async (req, res, next) => {
   try {
     const { code } = req.params;
     const codecheckErr = await checkCode(code);
-    if (codecheckErr) {return next(codecheckErr)};
+    if (codecheckErr) {
+      return next(codecheckErr);
+    }
 
-    const results = await db.query(
-      `DELETE FROM companies WHERE code=$1`,
-      [code]
-    );
-    return res.status(200).json({message: "Deleted"});
+    const results = await db.query(`DELETE FROM companies WHERE code=$1`, [
+      code,
+    ]);
+    return res.status(200).json({ message: "Deleted" });
   } catch (error) {
     return next(error);
   }
