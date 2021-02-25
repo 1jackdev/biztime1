@@ -9,6 +9,7 @@ app.use(express.urlencoded({ extended: false }));
 
 app.use("/companies", require("./routes/companies"))
 app.use("/invoices", require("./routes/invoices"))
+app.use("/industries", require("./routes/industries"))
 
 
 /** 404 handler */

@@ -51,7 +51,7 @@ router.get("/:id", async (req, res, next) => {
   }
 });
 
-// create new row in db
+// create new invoice in db
 router.post("/", async (req, res, next) => {
   try {
     const { comp_code, amt } = req.body;
@@ -73,11 +73,28 @@ router.put("/:id", async (req, res, next) => {
     if (codecheckErr) {
       return next(codecheckErr);
     }
-    const { amt } = req.body;
-    const results = await db.query(
-      `UPDATE invoices SET amt=$2 WHERE id=$1 RETURNING *`,
-      [id, amt]
-    );
+    const { amt, paid } = req.body;
+    const invResults = await db.query(`SELECT * FROM invoices WHERE id=$1`, [
+      id,
+    ]);
+    // update invoice depending on paid value
+    let results;
+    if (invResults.rows[0].paid === true && paid === false) {
+      results = await db.query(
+        `UPDATE invoices SET amt=$2, paid=$3, paid_date=null WHERE id=$1 RETURNING *`,
+        [id, amt, paid]
+      );
+    } else if (invResults.rows[0].paid === false && paid === true) {
+      results = await db.query(
+        `UPDATE invoices SET amt=$2, paid=$3, paid_date=NOW() WHERE id=$1 RETURNING *`,
+        [id, amt, paid]
+      );
+    } else {
+      results = await db.query(
+        `UPDATE invoices SET amt=$2 WHERE id=$1 RETURNING *`,
+        [id, amt]
+      );
+    }
     return res.status(200).json({ invoice: results.rows[0] });
   } catch (error) {
     return next(error);
@@ -93,9 +110,7 @@ router.delete("/:id", async (req, res, next) => {
       return next(codecheckErr);
     }
 
-    const results = await db.query(`DELETE FROM invoices WHERE id=$1`, [
-        id,
-    ]);
+    const results = await db.query(`DELETE FROM invoices WHERE id=$1`, [id]);
     return res.status(200).json({ message: "Deleted" });
   } catch (error) {
     return next(error);
