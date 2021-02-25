@@ -29,7 +29,7 @@ describe("GET /companies", () => {
   });
 });
 
-describe("GET /companies/bd", () => {
+describe("GET /companies/code", () => {
   test("Returns the company with code bd", async () => {
     const response = await request(app).get("/companies/bd");
     expect(response.statusCode).toBe(200);
@@ -60,7 +60,7 @@ describe("POST /companies", () => {
   });
 });
 
-describe("UPDATE /companies", () => {
+describe("UPDATE /companies/code", () => {
   test("Returns an updated company", async () => {
     const response = await request(app)
       .put("/companies/bd")
@@ -76,7 +76,7 @@ describe("UPDATE /companies", () => {
   });
 });
 
-describe("DELETE /companies", () => {
+describe("DELETE /companies/code", () => {
   test("Returns a deleted message", async () => {
     const response = await request(app).delete("/companies/bd");
     expect(response.statusCode).toBe(200);
