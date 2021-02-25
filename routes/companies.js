@@ -41,7 +41,7 @@ router.get("/:code", async (req, res, next) => {
       `SELECT * FROM invoices WHERE comp_code=$1`,
       [code]
     );
-    compResults.rows[0].invoices = invResults.rows
+    compResults.rows[0].invoices = invResults.rows;
     return res.json({ company: compResults.rows[0] });
   } catch (error) {
     return next(error);

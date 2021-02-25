@@ -1,8 +1,8 @@
-DROP DATABASE IF EXISTS biztime;
+DROP DATABASE IF EXISTS biztime_test;
 
-CREATE DATABASE biztime;
+CREATE DATABASE biztime_test;
 
-\c biztime
+\c biztime_test;
 
 DROP TABLE IF EXISTS invoices;
 DROP TABLE IF EXISTS companies;
@@ -10,7 +10,8 @@ DROP TABLE IF EXISTS companies;
 CREATE TABLE companies (
     code text PRIMARY KEY,
     name text NOT NULL UNIQUE,
-    description text
+    description text,
+    
 );
 
 CREATE TABLE invoices (
