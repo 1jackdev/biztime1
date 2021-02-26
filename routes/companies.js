@@ -79,7 +79,6 @@ router.put("/:code", async (req, res, next) => {
       return next(codecheckErr);
     }
     const { name, description, industries } = req.body;
-    // const industryResults;
     const results = await db.query(
       `UPDATE companies SET name=$2, description=$3 industries=$4 WHERE code=$1 RETURNING *`,
       [code, name, description, industries]
